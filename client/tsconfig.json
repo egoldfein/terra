@@ -9,18 +9,19 @@
     "outDir": "lib",
     "sourceMap": true,
     "target": "es5",
+    "module": "commonjs",
     "lib": ["es2015", "dom"],
     "skipLibCheck": true,
     "esModuleInterop": true,
     "strict": true,
+    "noImplicitAny": false,
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": true,
-    "module": "esnext",
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "typeRoots": ["node_modules/@types"]
   },
   "exclude": ["node_modules", "dist", "lib", "lib-amd"],
-  "include": ["src"]
+  "include": ["src", "src/custom.d.ts", "src/__mocks__", "__mocks__/svgMock.js"]
 }

@@ -1,14 +1,28 @@
+import React from "react";
 import {
   AppBar,
+  Button,
   Toolbar,
   Grid,
-  IconButton,
   Typography,
   Link,
+  Menu,
+  MenuItem,
 } from "@material-ui/core";
-import MenuIcon from "@material-ui/icons/Menu";
+import { useAuth0 } from "@auth0/auth0-react";
 
-export default function Header() {
+export default function Header({ user }: any) {
+  const { isAuthenticated, loginWithRedirect, logout } = useAuth0();
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
   return (
     <AppBar position="static" style={{ backgroundColor: "#283F3B" }}>
       <Toolbar>
@@ -23,9 +37,37 @@ export default function Header() {
               terra
             </Link>
           </Typography>
-          <IconButton edge="start" color="inherit" aria-label="menu">
-            <MenuIcon />
-          </IconButton>
+          {isAuthenticated && user ? (
+            <React.Fragment>
+              <Button
+                aria-controls="simple-menu"
+                aria-haspopup="true"
+                onClick={handleClick}
+              >
+                Hello, {user.name}
+              </Button>
+              <Menu
+                id="simple-menu"
+                anchorEl={anchorEl}
+                keepMounted
+                open={Boolean(anchorEl)}
+                onClose={handleClose}
+              >
+                <MenuItem
+                  component="a"
+                  href="/user/lists"
+                  onClick={handleClose}
+                >
+                  My Lists
+                </MenuItem>
+                <MenuItem onClick={() => logout()}>Logout</MenuItem>
+              </Menu>
+            </React.Fragment>
+          ) : null}
+
+          {!isAuthenticated && (
+            <Button onClick={() => loginWithRedirect()}>Login</Button>
+          )}
         </Grid>
       </Toolbar>
     </AppBar>

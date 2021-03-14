@@ -1,6 +1,5 @@
 import React from "react";
 import { Hidden, Button, Grid, Typography } from "@material-ui/core";
-import { Link } from "react-router-dom";
 import background_img_1 from "../../Assets/background.svg";
 import background_img_2 from "../../Assets/background_2.svg";
 import plant_img_1 from "../../Assets/plant_array.svg";
@@ -25,15 +24,14 @@ export default function Home() {
           <Typography variant="h3">Let's find your perfect plant.</Typography>
         </Grid>
         <Grid item xs={12} style={{ paddingTop: "20px" }}>
-          <Link to="/search">
-            <Button
-              variant="outlined"
-              size="large"
-              style={{ border: "2px solid white", color: "white" }}
-            >
-              Get Started
-            </Button>
-          </Link>
+          <Button
+            href="/search"
+            variant="outlined"
+            size="large"
+            style={{ border: "2px solid white", color: "white" }}
+          >
+            Get Started
+          </Button>
         </Grid>
       </Grid>
       <Grid
@@ -49,7 +47,7 @@ export default function Home() {
         spacing={4}
       >
         <Hidden smDown={true}>
-          <Grid sm={6} md={6}>
+          <Grid item sm={6} md={6}>
             <img src={`${plant_img_1}`} height="auto" width="700px" />
           </Grid>
         </Hidden>

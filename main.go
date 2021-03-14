@@ -4,14 +4,17 @@ import (
 	"context"
 	"os"
 
-	"github.com/aws/aws-sdk-go-v2/config"
-	"github.com/aws/aws-sdk-go/aws"
+	"github.com/egoldfein/terra/internal/dynamodb"
 	"github.com/egoldfein/terra/internal/trefle"
+	"github.com/egoldfein/terra/internal/users"
 	"github.com/egoldfein/terra/router"
 
-	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	log "github.com/sirupsen/logrus"
+
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/session"
 )
 
 func main() {
@@ -35,10 +38,10 @@ func main() {
 		awscfg.WithRegion(cfg.Region)
 	}
 
-	// sess := session.Must(session.NewSession(awscfg))
+	sess := session.Must(session.NewSession(awscfg))
 
 	// Using the Config value, create the DynamoDB client
-	// dynamoDB := dynamodb.New(sess)
+	 dynamoDB := dynamodb.New(sess)
 
 	// Set up trefle client
 	trefleClient, err := trefle.New(os.Getenv("TREFLE_API_KEY"))
@@ -46,10 +49,14 @@ func main() {
 		log.Error(err)
 	}
 
-	// handle slash commands
-	r := gin.Default()
-	router.AddRoutes(ctx, r, trefleClient)
+		// Set up trefle client
+	usersClient, err := users.New(dynamoDB)
+	if err != nil {
+		log.Error(err)
+	}
 
-	r.Run()
+	// Set up and run router
+	router := router.New(ctx, trefleClient, usersClient)
+	router.Engine.Run()
 
 }

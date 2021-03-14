@@ -13,35 +13,35 @@ const (
 	endpoint = "https://trefle.io/api/v1"
 )
 
-//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Trefle
-type Trefle interface {
-	SearchPlants(ctx context.Context, light *string, edible *string, search *string) (PlantListResp, error)
-	GetPlant(ctx context.Context, id string) (*Plant, error)
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . API
+type API interface {
+	SearchPlants(ctx context.Context, light *string, edible *string, search *string, page *string) (PlantListResp, error)
+	GetPlant(ctx context.Context, id string) (*PlantResp, error)
+	GetDistribution(ctx context.Context, id string) (*DistributionResp, error)
 }
 
-type Client struct {
-	token      string
+type APIClient struct {
 	endpoint   string
 	key        string
-	httpClient *http.Client
+	Client *http.Client
 }
 
 // New returns a new NYT API Client
-func New(key string) (*Client, error) {
+func New(key string) (*APIClient, error) {
 	if key == "" {
 		return nil, errors.New("api key cannot be empty")
 	}
-	c := &Client{
+	a := &APIClient{
 		endpoint:   endpoint,
 		key:        key,
-		httpClient: &http.Client{},
+		Client: &http.Client{},
 	}
 
-	return c, nil
+	return a, nil
 }
 
 // SearchPlants gets a list of plants based on the search string and query parameters
-func (api *Client) SearchPlants(ctx context.Context, light *string, edible *string, search *string, page *string) (PlantListResp, error) {
+func (api *APIClient) SearchPlants(ctx context.Context, light *string, edible *string, search *string, page *string) (PlantListResp, error) {
 	// Build query string
 	query := ""
 	path := "/plants?"
@@ -72,9 +72,10 @@ func (api *Client) SearchPlants(ctx context.Context, light *string, edible *stri
 
 
 	// Filter out plants that do not have these values set
-	query = fmt.Sprintf("%sfilter_not[frost_free_days_minimum]=null&filter_not[light]=null&filter_not[minimum_precipitation_mm]=null&filter_not[minimum_temperature_deg_f]=null&filter_not[minimum_precipitation_mm]=null&filter_not[maximum_precipitation_mm]=null&filter_not[growth_months]=null", query)
+	// query = fmt.Sprintf("%s&filter_not[light]=null&filter_not[maximum_temperature_deg_f]=null&filter_not[minimum_temperature_deg_f]=null&filter_not[minimum_precipitation_mm]=null&filter_not[maximum_precipitation_mm]=null", query)
+	query = fmt.Sprintf("%s&filter_not[common_name]=null", query)
 	urlStr := fmt.Sprintf("%s%s%s&token=%s", api.endpoint, path, query, api.key)
-	resp, err := api.httpClient.Get(urlStr)
+	resp, err := api.Client.Get(urlStr)
 	if err != nil {
 		return PlantListResp{}, err
 	}
@@ -110,27 +111,43 @@ func (api *Client) SearchPlants(ctx context.Context, light *string, edible *stri
 }
 
 // GetPlant gets a list of plants based on the query string
-func (api *Client) GetPlant(ctx context.Context, id string) (PlantResp, error) {
+func (api *APIClient) GetPlant(ctx context.Context, id string) (*PlantResp, error) {
 	if len(id) == 0 {
-		return PlantResp{}, errors.New("id cannot be empty")
+		return nil, errors.New("id cannot be empty")
 	}
 
 	urlStr := fmt.Sprintf("%s/plants/%s?token=%s", api.endpoint, id, api.key)
-	resp, err := api.httpClient.Get(urlStr)
+	resp, err := api.Client.Get(urlStr)
 	if err != nil {
-		return PlantResp{}, err
+		return nil, err
 	}
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return PlantResp{}, err
+		return nil, err
 	}
 
 	rawPlant := RawPlant{}
 	err = json.Unmarshal(body, &rawPlant)
 	if err != nil {
-		return PlantResp{}, err
+		return nil, err
+	}
+
+	var zoneMap = make(map[int]bool)
+	var zones []Zone
+	for _, zone := range rawPlant.Data.Species.Distributions.Native {
+		if !zoneMap[zone.ID] {
+			zoneMap[zone.ID] = true
+			zones = append(zones, zone)
+		}
+	}
+
+	for _, zone := range rawPlant.Data.Species.Distributions.Introduced {
+		if !zoneMap[zone.ID] {
+			zoneMap[zone.ID] = true
+			zones = append(zones, zone)
+		}
 	}
 
 	plantResp := PlantResp{
@@ -139,6 +156,7 @@ func (api *Client) GetPlant(ctx context.Context, id string) (PlantResp, error) {
 		ScientificName: rawPlant.Data.ScientificName,
 		Edible: rawPlant.Data.Species.Edible,
 		Light: rawPlant.Data.Species.Growth.Light,
+		Duration: rawPlant.Data.Species.Duration,
 		Humidity: rawPlant.Data.Species.Growth.AtmosphericHumidity,
 		MinTemperature: rawPlant.Data.Species.Growth.MinimumTemperature.Farenheit,
 		MaxTemperature: rawPlant.Data.Species.Growth.MaximumTemperature.Farenheit,
@@ -146,7 +164,36 @@ func (api *Client) GetPlant(ctx context.Context, id string) (PlantResp, error) {
 		MaxPrecipitation: rawPlant.Data.Species.Growth.MaximumPrecipitation.Millimeters,
 		GrowthMonths: rawPlant.Data.Species.Growth.GrowthMonths,
 		ImageURL: rawPlant.Data.ImageURL,
+		Zones: zones,
 	}
 
-	return plantResp, nil
+	return &plantResp, nil
+}
+
+func (api *APIClient) GetDistribution(ctx context.Context, id string) (*DistributionResp, error) {
+
+	if len(id) == 0 {
+		return nil, errors.New("id cannot be empty")
+	}
+
+	urlStr := fmt.Sprintf("%s/distributions/%s?token=%s", api.endpoint, id, api.key)
+
+	resp, err := api.Client.Get(urlStr)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	distrResp := DistributionResp{}
+	err = json.Unmarshal(body, &distrResp)
+	if err != nil {
+		return nil, err
+	}
+
+	return &distrResp, nil
 }

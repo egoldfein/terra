@@ -8,45 +8,39 @@ import {
   InputAdornment,
   Switch,
 } from "@material-ui/core";
-import { Plant } from "../../services/Plants/PlantTypes";
 import SearchIcon from "@material-ui/icons/Search";
 
 interface Props {
   light: string;
-  edible: string;
+  edible: boolean;
   search: string;
   onSearch: (params: URLSearchParams) => void;
 }
 
+const params = new URLSearchParams();
 export default function Search(props: Props) {
   const [light, setLight] = useState<string>(props.light);
-  const [edible, setEdible] = useState<string>(props.edible);
+  const [edible, setEdible] = useState<boolean>(props.edible);
   const [search, setSearch] = useState<string>(props.search);
-  const [plants, setPlants] = useState<Plant[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
 
   const onSelectChange = (e: React.ChangeEvent<any>) => {
     setLight(e.target.value);
   };
 
   const onSwitchChange = (e: React.ChangeEvent<any>) => {
-    setEdible(e.target.value);
-  };
-
-  const onSubmit = async () => {
-    setLoading(true);
-
-    const params = new URLSearchParams({
-      light: light,
-      edible: edible,
-      search: search,
-      page: "",
-    });
-    props.onSearch(params);
+    setEdible(e.target.checked);
   };
 
   const onInputChange = (e: React.ChangeEvent<any>) => {
     setSearch(e.currentTarget.value);
+  };
+
+  const onSubmit = async () => {
+    params.set("light", light);
+    params.set("edible", edible ? "true" : "");
+    params.set("search", search);
+    params.set("page", "");
+    props.onSearch(params);
   };
 
   return (
@@ -100,7 +94,7 @@ export default function Search(props: Props) {
         >
           <Grid item>No</Grid>
           <Grid item>
-            <Switch onChange={(e) => onSwitchChange(e)} />
+            <Switch checked={edible} onChange={(e) => onSwitchChange(e)} />
           </Grid>
           <Grid item>Yes</Grid>
         </Grid>

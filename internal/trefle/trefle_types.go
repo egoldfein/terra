@@ -1,16 +1,5 @@
 package trefle
 
-// type RawSpeciesListResp struct {
-// 	Data  []Species `json:"data"`
-// 	Links Link     `json:"links"`
-// 	Meta  Meta     `json:"meta"`
-// }
-
-// type RawSpeciesResp struct {
-// 	Data  Species `json:"data"`
-// 	Meta  Meta     `json:"meta"`
-// }
-
 type RawPlantList struct {
 	Data  []Plant `json:"data"`
 	Links Links    `json:"links"`
@@ -56,18 +45,29 @@ type Species struct {
 	CommonName string    `json:"common_name"`
 	ScientificName string `json:"scientific_name"`
 	Edible bool `json:"edible"`
+	Duration []string `json:"duration"`
 	Distributions Distribution `json:"distributions"`
 	Specifications Specifications `json:"specifications"`
 	Growth Growth `json:"growth"`
 }
 
-type Distribution struct {
-	Native []Native `json:"native"`
+type DistributionResp struct {
+	Zone Zone `json:"zone"`
 }
 
-type Native struct {
+type Distribution struct {
+	Native []Zone `json:"native"`
+	Introduced []Zone `json:"introduced"`
+}
+
+type Zone struct {
+	ID int `json:"id"`
 	Name string `json:"name"`
 	Slug string `json:"slug"`
+	TDWGLevel int `json:"tdwg_level"`
+	TDWGCode string `json:"tdwg_code"`
+	Parent *Zone `json:"parent,omitempty"`
+	Child []*Zone `json:"child,omitempty"`
 }
 
 type Specifications struct {
@@ -116,12 +116,14 @@ type PlantResp struct {
 	CommonName string    `json:"common_name"`
 	ScientificName string `json:"scientific_name"`
 	Edible bool `json:"edible"`
-	Light int `json:"light"`
-	Humidity int `json:"humidity"`
-	MinTemperature int `json:"min_temp"`
-	MaxTemperature int `json:"max_temp"`
-	MinPrecipitation int `json:"min_precip"`
-	MaxPrecipitation int `json:"max_precip"`
-	GrowthMonths []string `json:"growth_months"`
-	ImageURL   string    `json:"image_url"`
+	Light int `json:"light,omitempty"`
+	Humidity int `json:"humidity,omitempty"`
+	MinTemperature int `json:"min_temp,omitempty"`
+	MaxTemperature int `json:"max_temp,omitempty"`
+	MinPrecipitation int `json:"min_precip,omitempty"`
+	MaxPrecipitation int `json:"max_precip,omitempty"`
+	GrowthMonths []string `json:"growth_months,omitempty"`
+	Duration []string `json:"duration,omitempty"`
+	ImageURL   string    `json:"image_url,"`
+	Zones []Zone `json:"zones"`
 }

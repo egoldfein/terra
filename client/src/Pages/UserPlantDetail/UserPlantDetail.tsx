@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { Grid, LinearProgress } from "@material-ui/core";
-import PlantDetail from "../../Components/PlantDetail/PlantDetail";
+import PlantDetail from "../../Components/UserPlants/UserPlantDetail/UserPlantDetail";
 import PlantService from "../../Services/Plants/PlantService";
-import { Plant } from "../../Services/Plants/PlantTypes";
+import { UserPlant, TreflePlant } from "../../Services/Plants/PlantTypes";
 import { match } from "react-router-dom";
 
 interface Params {
@@ -15,12 +15,15 @@ interface Props {
 
 export default function PlantPage(props: Props) {
   const [loading, setLoading] = useState<boolean>(true);
-  const [plant, setPlant] = useState<Plant>();
+  const [plant, setPlant] = useState<UserPlant>();
+  const [plantDetail, setPlantDetail] = useState<TreflePlant>();
 
   useEffect(() => {
     async function fn() {
-      let plant = await PlantService.GetPlant(props.match.params.id);
+      let plant = await PlantService.GetUserPlant(props.match.params.id);
+      let plantDetail = await PlantService.GetTreflePlant(plant.plant_id);
       setPlant(plant);
+      setPlantDetail(plantDetail);
       setLoading(false);
     }
 
@@ -35,7 +38,7 @@ export default function PlantPage(props: Props) {
     return (
       <Grid container spacing={3}>
         <Grid item xs={12}>
-          <PlantDetail plant={plant} loading={loading} />
+          <PlantDetail plant={plant} plantDetail={plantDetail} />
         </Grid>
       </Grid>
     );
