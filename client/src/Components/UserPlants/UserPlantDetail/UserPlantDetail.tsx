@@ -104,7 +104,7 @@ export default function PlantDetail(props: Props) {
               </Typography>
             </Grid>
             <Grid item xs={12}>
-              <Typography variant="h6">Watering Freqeuncy</Typography>
+              <Typography variant="h6">Watering Frequency</Typography>
               <Typography variant="body1">
                 {props.plant.watering_frequency}
               </Typography>

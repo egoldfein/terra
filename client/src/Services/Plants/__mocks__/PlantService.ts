@@ -35,6 +35,14 @@ let mockPlant2: TreflePlant = {
   max_precip: 40,
 };
 
+let mockUserPlant: UserPlant = {
+  id: 0,
+  plant_id: "1",
+  name: "my plant",
+  last_watered: "123",
+  watering_frequency: "daily",
+};
+
 let mockPlantList: TreflePlantList = {
   plants: [mockPlant, mockPlant2],
   links: {
@@ -58,6 +66,7 @@ export class MockPlantService implements IPlantService {
   __getNone = null;
   __getSome = mockPlantList;
   __getZone = mockZone;
+  __getOneUserPlant = mockUserPlant;
 
   async ListTreflePlants(params: URLSearchParams): Promise<TreflePlantList> {
     return Promise.resolve(mockPlantList);

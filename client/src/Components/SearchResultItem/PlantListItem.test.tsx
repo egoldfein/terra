@@ -1,5 +1,11 @@
 import { shallow } from "enzyme";
-import { Card, CardMedia, Link, Typography } from "@material-ui/core";
+import {
+  Card,
+  CardMedia,
+  CardHeader,
+  Button,
+  Typography,
+} from "@material-ui/core";
 import { Skeleton } from "@material-ui/lab";
 import PlantListItem from "./PlantListItem";
 import MockPlantService from "../../Services/Plants/__mocks__/PlantService";
@@ -18,17 +24,16 @@ describe("<PlantListItem />", () => {
     const wrapper = shallow(
       <PlantListItem plant={MockPlantService.__getOne} />
     );
-    expect(wrapper.find(Typography).text()).toEqual(
+    expect(wrapper.find(CardHeader).prop("title")).toContain(
       MockPlantService.__getOne.common_name
     );
-    expect(wrapper.find(Typography).prop("variant")).toEqual("body1");
   });
 
   it("should render link to detail page", () => {
     const wrapper = shallow(
       <PlantListItem plant={MockPlantService.__getOne} />
     );
-    expect(wrapper.find(Link).prop("href")).toEqual(
+    expect(wrapper.find(Button).prop("href")).toEqual(
       `/plant/${MockPlantService.__getOne.id}`
     );
   });

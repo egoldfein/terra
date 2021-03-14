@@ -17,7 +17,7 @@ describe("<Plant />", () => {
   });
 
   it("should call get plant with id in params", () => {
-    let getPlant = jest.spyOn(PlantService, "GetTreflePlant");
+    let getPlant = jest.spyOn(PlantService, "GetUserPlant");
     render(<Plant match={params} />);
     expect(getPlant).toHaveBeenCalledWith("123");
   });
