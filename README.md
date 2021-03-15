@@ -26,4 +26,4 @@ What's next:
 
 - run `npm run build`
 - cd to root directory and run `go mod vendor`
-- run `make dev` and go to http://localhost:8080
+- run `make dev` and go to `http://localhost:8080`
