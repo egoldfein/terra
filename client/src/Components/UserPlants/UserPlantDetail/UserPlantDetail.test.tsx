@@ -1,17 +1,19 @@
 import { createMount } from "@material-ui/core/test-utils";
 import { Typography } from "@material-ui/core";
-import PlantDetail from "./UserPlantDetail";
+import UserPlantDetail from "./UserPlantDetail";
 import MockPlantService from "../../../Services/Plants/__mocks__/PlantService";
+import PlantService from "../../../Services/Plants/PlantService";
+import RelativeTime from "../../../Services/Utils/TimeUtils";
 
-describe("<PlantDetail />", () => {
+describe("<UserPlantDetail />", () => {
   let mount: any;
   beforeEach(() => {
     mount = createMount({});
   });
 
-  it("should render PlantDetail component", () => {
+  it("should render UserPlantDetail component", () => {
     const wrapper = mount(
-      <PlantDetail
+      <UserPlantDetail
         plant={MockPlantService.__getOneUserPlant}
         plantDetail={MockPlantService.__getOne}
       />
@@ -21,7 +23,7 @@ describe("<PlantDetail />", () => {
 
   it("should render all available plant information", () => {
     const wrapper = mount(
-      <PlantDetail
+      <UserPlantDetail
         plant={MockPlantService.__getOneUserPlant}
         plantDetail={MockPlantService.__getOne}
       />
@@ -48,7 +50,7 @@ describe("<PlantDetail />", () => {
     expect(lastWateredHeader.text()).toEqual("Last Watered");
     expect(lastWateredHeader.prop("variant")).toEqual("h6");
     expect(lastWateredBody.text()).toEqual(
-      MockPlantService.__getOneUserPlant.last_watered?.toString()
+      RelativeTime(MockPlantService.__getOneUserPlant.last_watered)
     );
     expect(lastWateredBody.prop("variant")).toEqual("body1");
 
@@ -61,13 +63,23 @@ describe("<PlantDetail />", () => {
     );
     expect(lastWateredBody.prop("variant")).toEqual("body1");
 
-    let reqLightHeader = wrapper.find(Typography).at(7);
-    let reqLightBody = wrapper.find(Typography).at(8);
-    expect(reqLightHeader.text()).toEqual("Required Humidity");
-    expect(reqLightHeader.prop("variant")).toEqual("h6");
-    expect(reqLightBody.text()).toEqual(
-      MockPlantService.__getOne.humidity?.toString()
+    let reqHumidityHeader = wrapper.find(Typography).at(7);
+    let reqHumidityBody = wrapper.find(Typography).at(8);
+    expect(reqHumidityHeader.text()).toEqual("Required Humidity");
+    expect(reqHumidityHeader.prop("variant")).toEqual("h6");
+
+    if (MockPlantService.__getOne.humidity) {
+      expect(reqHumidityBody.text()).toEqual(
+        PlantService.GetLevel(MockPlantService.__getOne?.humidity)
+      );
+    }
+    expect(reqHumidityBody.prop("variant")).toEqual("body1");
+  });
+
+  it("should display plant not found", () => {
+    const wrapper = mount(
+      <UserPlantDetail plant={undefined} plantDetail={undefined} />
     );
-    expect(reqLightBody.prop("variant")).toEqual("body1");
+    expect(wrapper.text()).toEqual("404 Plant Not Found");
   });
 });

@@ -3,7 +3,7 @@ import { Router } from "react-router";
 import history from "./history";
 import Home from "./Pages/Home/Home";
 import Search from "./Pages/Search/Search";
-import Plant from "./Pages/UserPlantDetail/UserPlantDetail";
+import UserPlantDetail from "./Pages/UserPlantDetail/UserPlantDetail";
 import Header from "./Components/Header/Header";
 import UserPlantLists from "./Pages/UserPlantLists/UserPlantLists";
 import UserPlantList from "./Components/UserPlants/UserPlantList/UserPlantList";
@@ -26,7 +26,10 @@ function App() {
         <Switch>
           <Route exact path="/" component={Home} />
           <Route path="/search" render={() => <Search user={user} />} />
-          <Route path="/plant/:id" render={(props) => <Plant {...props} />} />
+          <Route
+            path="/plant/:id"
+            render={(props: any) => <UserPlantDetail {...props} user={user} />}
+          />
           <Route
             path="/user/lists"
             render={() => <UserPlantLists user={user} />}

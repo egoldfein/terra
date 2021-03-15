@@ -20,20 +20,8 @@ export interface TreflePlant {
   zones?: Zone[];
 }
 
-export interface UserPlant {
-  id: number;
-  plant_id: string;
-  name: string;
-  last_watered: string;
-  watering_frequency: string;
-}
-
-export interface UserPlantList {
-  name: string;
-  id: string;
-  user_id: string;
-}
-
+// Zone defines the distribution zone type returned from the Trefle API
+// See https://docs.trefle.io/docs/advanced/plants-fields#distributions for more information
 export interface Zone {
   id: number;
   name: string;
@@ -50,6 +38,22 @@ export interface Link {
   first: string;
 }
 
+// UserPlant defines a user created plant
+export interface UserPlant {
+  id: number;
+  plant_id: string;
+  name: string;
+  last_watered: string;
+  watering_frequency: string;
+}
+
+// UserPlantList defines a user created list
+export interface UserPlantList {
+  name: string;
+  id: string;
+  user_id: string;
+}
+
 export interface IPlantService {
   ListTreflePlants(params: URLSearchParams): Promise<TreflePlantList>;
   GetTreflePlant(id: string): Promise<TreflePlant>;
@@ -64,4 +68,5 @@ export interface IPlantService {
   GetDistribution(id: number): Promise<Zone>;
   GetUserPlantLists(userID: string): Promise<UserPlantList[]>;
   GetUserPlantList(id: string): Promise<UserPlant[]>;
+  GetLevel(measurement: number): string;
 }

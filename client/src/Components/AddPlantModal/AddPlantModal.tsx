@@ -1,16 +1,17 @@
+import { useState, useEffect } from "react";
 import {
   Dialog,
   Button,
+  InputLabel,
   DialogActions,
   DialogTitle,
   DialogContent,
   TextField,
   Select,
+  FormControl,
 } from "@material-ui/core";
-import { useState } from "react";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import { useTheme } from "@material-ui/core/styles";
-import { useEffect } from "react";
 import { UserPlantList } from "../../Services/Plants/PlantTypes";
 import PlantService from "../../Services/Plants/PlantService";
 
@@ -24,6 +25,7 @@ interface Props {
     plantID: string,
     frequency: string
   ): void;
+  handleClose(): void;
 }
 
 export default function AddPlantModal(props: Props) {
@@ -45,6 +47,10 @@ export default function AddPlantModal(props: Props) {
     fn();
   }, []);
 
+  const handleClose = () => {
+    props.handleClose();
+  };
+
   const handleAdd = () => {
     props.handleAdd(name, listID, props.plantID, frequency);
   };
@@ -63,35 +69,55 @@ export default function AddPlantModal(props: Props) {
 
   return (
     <Dialog fullScreen={fullScreen} open={props.open}>
-      <DialogTitle id="form-dialog-title">Subscribe</DialogTitle>
+      <DialogTitle id="form-dialog-title">Add Plant to List</DialogTitle>
       <DialogContent>
-        <TextField
-          autoFocus
-          margin="dense"
-          id="name"
-          label="Name"
-          fullWidth
-          value={name}
-          onChange={(e) => onInputChange(e)}
-        />
-        <Select value={listID} onChange={(e) => onListSelectChange(e)}>
-          <option value=""></option>
-          {plantLists.map((list: UserPlantList, i: number) => {
-            return (
-              <option key={i} value={list.id}>
-                {list.name}
-              </option>
-            );
-          })}
-        </Select>
-        <Select value={frequency} onChange={(e) => onFrequencySelectChange(e)}>
-          <option value="daily">Daily</option>
-          <option value="weekly">Weekly</option>
-          <option value="bi-weekly">Every two weeks</option>
-          <option value="monthly">Monthly</option>
-        </Select>
+        <FormControl required fullWidth>
+          <TextField
+            autoFocus
+            margin="dense"
+            id="name"
+            label="Give your plant a name"
+            value={name}
+            onChange={(e) => onInputChange(e)}
+          />
+        </FormControl>
+        <FormControl required fullWidth>
+          <InputLabel id="list-label">Select List</InputLabel>
+          <Select
+            labelId="list-label"
+            value={listID}
+            onChange={(e) => onListSelectChange(e)}
+          >
+            <option value=""></option>
+            {plantLists.map((list: UserPlantList, i: number) => {
+              return (
+                <option key={i} value={list.id}>
+                  {list.name}
+                </option>
+              );
+            })}
+          </Select>
+        </FormControl>
+        <FormControl required fullWidth>
+          <InputLabel id="frequency-label">
+            Select watering frequency
+          </InputLabel>
+          <Select
+            labelId="frequency-label"
+            value={frequency}
+            onChange={(e) => onFrequencySelectChange(e)}
+          >
+            <option value="daily">Daily</option>
+            <option value="weekly">Weekly</option>
+            <option value="bi-weekly">Every two weeks</option>
+            <option value="monthly">Monthly</option>
+          </Select>
+        </FormControl>
       </DialogContent>
       <DialogActions>
+        <Button onClick={handleClose} color="default">
+          Close
+        </Button>
         <Button onClick={handleAdd} color="primary">
           Add
         </Button>

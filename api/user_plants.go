@@ -31,7 +31,6 @@ type UserPlantHandler struct {
 	userClient user_plants.API
 }
 
-
 func NewUserPlantHandler(u user_plants.API) *UserPlantHandler {
 	return &UserPlantHandler{
 		userClient: u,
@@ -109,16 +108,23 @@ func (u *UserPlantHandler) AddPlant(c *gin.Context) error{
 
 func (u *UserPlantHandler) UpdatePlant(c *gin.Context) error{
 	jsonData, err := ioutil.ReadAll(c.Request.Body)
+	if err != nil {
+		return err 
+	}
+	    
 	var updatePlantRequest UpdatePlantRequest
-	json.Unmarshal(jsonData, &updatePlantRequest)
+	err = json.Unmarshal(jsonData, &updatePlantRequest)
+	if err != nil {
+		return err
+	}
 
-	err = u.userClient.UpdatePlant(c, updatePlantRequest.PlantID, updatePlantRequest.LastWatered)
+	_, err = u.userClient.UpdatePlant(c, updatePlantRequest.PlantID, updatePlantRequest.LastWatered)
 	if err != nil {
 		return err
 	}
 
 	c.Header("Content-Type", "application/json")
-	c.JSON(http.StatusOK, gin.H{})
+	c.JSON(http.StatusOK, nil)
 
 	return nil
 }

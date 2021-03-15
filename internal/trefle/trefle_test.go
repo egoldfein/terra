@@ -16,13 +16,13 @@ const (
 )
 
 func TestNewSuccess(t *testing.T) {
-	client, err := trefle.New(testToken)
+	client, err := trefle.New(testToken, nil)
 	assert.NoError(t, err)
 	assert.NotNil(t, client)
 }
 
 func TestNewError(t *testing.T) {
-	client, err := trefle.New("")
+	client, err := trefle.New("", nil)
 	assert.Error(t, err)
 	assert.Equal(t, err.Error(), "api key cannot be empty")
 	assert.Nil(t, client)
@@ -86,7 +86,6 @@ func TestSearchPlant(t *testing.T) {
 		assert.Equal(t, plantList.Plants[0].CommonName, "plant1")
 		assert.Equal(t, plantList.Plants[0].ID, 1)
 	}
-
 }
 
 func TestGetPlant(t *testing.T) {

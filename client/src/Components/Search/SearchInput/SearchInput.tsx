@@ -18,7 +18,7 @@ interface Props {
 }
 
 const params = new URLSearchParams();
-export default function Search(props: Props) {
+export default function SearchInput(props: Props) {
   const [light, setLight] = useState<string>(props.light);
   const [edible, setEdible] = useState<boolean>(props.edible);
   const [search, setSearch] = useState<string>(props.search);
@@ -38,7 +38,7 @@ export default function Search(props: Props) {
   const onSubmit = async () => {
     params.set("light", light);
     params.set("edible", edible ? "true" : "");
-    params.set("search", search);
+    params.set("search", encodeURIComponent(search));
     params.set("page", "");
     props.onSearch(params);
   };

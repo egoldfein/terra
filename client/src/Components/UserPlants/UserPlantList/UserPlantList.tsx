@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import {
+  Box,
   Card,
   CardHeader,
   CardContent,
@@ -10,14 +11,16 @@ import {
   Grid,
   LinearProgress,
 } from "@material-ui/core";
+import OpacityIcon from "@material-ui/icons/Opacity";
 import { UserPlant } from "../../../Services/Plants/PlantTypes";
 import PlantService from "../../../Services/Plants/PlantService";
-import OpacityIcon from "@material-ui/icons/Opacity";
+import RelativeDate from "../../../Services/Utils/TimeUtils";
+
 interface Props {
   id: string;
 }
 
-export default function UserPlantListPage(props: Props) {
+export default function UserPlantList(props: Props) {
   const [plants, setPlants] = useState<UserPlant[]>();
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -44,9 +47,11 @@ export default function UserPlantListPage(props: Props) {
     return (
       <Grid container spacing={3}>
         {plants?.map((plant: UserPlant, i: number) => {
+          let lastWatered = RelativeDate(plant.last_watered);
           return (
             <Grid
               item
+              key={i}
               xs={12}
               sm={12}
               md={6}
@@ -58,22 +63,26 @@ export default function UserPlantListPage(props: Props) {
                 <CardHeader
                   action={
                     <IconButton
-                      aria-label="add"
+                      aria-label="marked-watered"
                       onClick={() => markWatered(plant.id.toString())}
                     >
                       <OpacityIcon />
                     </IconButton>
                   }
                   title={plant.name}
-                  titleTypographyProps={{ variant: "body2", align: "left" }}
+                  titleTypographyProps={{ variant: "body1", align: "left" }}
                 />
-                <CardContent>
-                  <CardActions disableSpacing>
-                    <Button size="small" href={`/plant/${plant.id}`}>
-                      See Details
-                    </Button>
-                  </CardActions>
+                <CardContent style={{ textAlign: "left" }}>
+                  <Box fontWeight="fontWeightBold">
+                    <Typography variant="body2">Last Watered</Typography>
+                  </Box>
+                  <Typography variant="body2">{lastWatered}</Typography>
                 </CardContent>
+                <CardActions disableSpacing>
+                  <Button size="small" href={`/plant/${plant.id}`}>
+                    See Details
+                  </Button>
+                </CardActions>
               </Card>
             </Grid>
           );
@@ -83,7 +92,13 @@ export default function UserPlantListPage(props: Props) {
   }
 
   return (
-    <Grid container spacing={3}>
+    <Grid
+      container
+      spacing={3}
+      justify="center"
+      alignContent="center"
+      style={{ textAlign: "center", paddingTop: "50px" }}
+    >
       <Grid item xs={12}>
         <Typography>
           You currently don't have any plants in this list.

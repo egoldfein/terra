@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { Grid, LinearProgress } from "@material-ui/core";
+import { match } from "react-router-dom";
+import { Grid, LinearProgress, Typography } from "@material-ui/core";
+import { UserPlant, TreflePlant } from "../../Services/Plants/PlantTypes";
 import PlantDetail from "../../Components/UserPlants/UserPlantDetail/UserPlantDetail";
 import PlantService from "../../Services/Plants/PlantService";
-import { UserPlant, TreflePlant } from "../../Services/Plants/PlantTypes";
-import { match } from "react-router-dom";
+import NotFound from "../../Pages/NotFound/NotFound";
 
 interface Params {
   id: string;
@@ -13,7 +14,7 @@ interface Props {
   match: match<Params>;
 }
 
-export default function PlantPage(props: Props) {
+export default function UserPlantDetail(props: Props, user: any) {
   const [loading, setLoading] = useState<boolean>(true);
   const [plant, setPlant] = useState<UserPlant>();
   const [plantDetail, setPlantDetail] = useState<TreflePlant>();
@@ -34,6 +35,16 @@ export default function PlantPage(props: Props) {
     return <LinearProgress />;
   }
 
+  if (!user) {
+    return (
+      <Grid item xs={12}>
+        <Typography variant="body1">
+          You must be logged in to view your plants
+        </Typography>
+      </Grid>
+    );
+  }
+
   if (plant !== undefined) {
     return (
       <Grid container spacing={3}>
@@ -43,5 +54,6 @@ export default function PlantPage(props: Props) {
       </Grid>
     );
   }
-  return <div />;
+
+  return <NotFound />;
 }

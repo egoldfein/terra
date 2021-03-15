@@ -83,7 +83,7 @@ type FakeAPI struct {
 		result1 *[]user_plants.PlantList
 		result2 error
 	}
-	UpdatePlantStub        func(context.Context, string, string) error
+	UpdatePlantStub        func(context.Context, string, string) (*user_plants.Plant, error)
 	updatePlantMutex       sync.RWMutex
 	updatePlantArgsForCall []struct {
 		arg1 context.Context
@@ -91,10 +91,12 @@ type FakeAPI struct {
 		arg3 string
 	}
 	updatePlantReturns struct {
-		result1 error
+		result1 *user_plants.Plant
+		result2 error
 	}
 	updatePlantReturnsOnCall map[int]struct {
-		result1 error
+		result1 *user_plants.Plant
+		result2 error
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
@@ -429,7 +431,7 @@ func (fake *FakeAPI) GetPlantListsReturnsOnCall(i int, result1 *[]user_plants.Pl
 	}{result1, result2}
 }
 
-func (fake *FakeAPI) UpdatePlant(arg1 context.Context, arg2 string, arg3 string) error {
+func (fake *FakeAPI) UpdatePlant(arg1 context.Context, arg2 string, arg3 string) (*user_plants.Plant, error) {
 	fake.updatePlantMutex.Lock()
 	ret, specificReturn := fake.updatePlantReturnsOnCall[len(fake.updatePlantArgsForCall)]
 	fake.updatePlantArgsForCall = append(fake.updatePlantArgsForCall, struct {
@@ -445,9 +447,9 @@ func (fake *FakeAPI) UpdatePlant(arg1 context.Context, arg2 string, arg3 string)
 		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
-		return ret.result1
+		return ret.result1, ret.result2
 	}
-	return fakeReturns.result1
+	return fakeReturns.result1, fakeReturns.result2
 }
 
 func (fake *FakeAPI) UpdatePlantCallCount() int {
@@ -456,7 +458,7 @@ func (fake *FakeAPI) UpdatePlantCallCount() int {
 	return len(fake.updatePlantArgsForCall)
 }
 
-func (fake *FakeAPI) UpdatePlantCalls(stub func(context.Context, string, string) error) {
+func (fake *FakeAPI) UpdatePlantCalls(stub func(context.Context, string, string) (*user_plants.Plant, error)) {
 	fake.updatePlantMutex.Lock()
 	defer fake.updatePlantMutex.Unlock()
 	fake.UpdatePlantStub = stub
@@ -469,27 +471,30 @@ func (fake *FakeAPI) UpdatePlantArgsForCall(i int) (context.Context, string, str
 	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
 }
 
-func (fake *FakeAPI) UpdatePlantReturns(result1 error) {
+func (fake *FakeAPI) UpdatePlantReturns(result1 *user_plants.Plant, result2 error) {
 	fake.updatePlantMutex.Lock()
 	defer fake.updatePlantMutex.Unlock()
 	fake.UpdatePlantStub = nil
 	fake.updatePlantReturns = struct {
-		result1 error
-	}{result1}
+		result1 *user_plants.Plant
+		result2 error
+	}{result1, result2}
 }
 
-func (fake *FakeAPI) UpdatePlantReturnsOnCall(i int, result1 error) {
+func (fake *FakeAPI) UpdatePlantReturnsOnCall(i int, result1 *user_plants.Plant, result2 error) {
 	fake.updatePlantMutex.Lock()
 	defer fake.updatePlantMutex.Unlock()
 	fake.UpdatePlantStub = nil
 	if fake.updatePlantReturnsOnCall == nil {
 		fake.updatePlantReturnsOnCall = make(map[int]struct {
-			result1 error
+			result1 *user_plants.Plant
+			result2 error
 		})
 	}
 	fake.updatePlantReturnsOnCall[i] = struct {
-		result1 error
-	}{result1}
+		result1 *user_plants.Plant
+		result2 error
+	}{result1, result2}
 }
 
 func (fake *FakeAPI) Invocations() map[string][][]interface{} {

@@ -9,27 +9,28 @@ import {
   CardMedia,
   IconButton,
 } from "@material-ui/core";
-import AddIcon from "@material-ui/icons/Add";
 import { Skeleton } from "@material-ui/lab";
-import { TreflePlant } from "../../Services/Plants/PlantTypes";
-import PlantService from "../../Services/Plants/PlantService";
-import AddPlantModal from "../AddPlantModal/AddPlantModal";
+import AddIcon from "@material-ui/icons/Add";
+import { TreflePlant } from "../../../Services/Plants/PlantTypes";
+import PlantService from "../../../Services/Plants/PlantService";
+import AddPlantModal from "../../AddPlantModal/AddPlantModal";
+import PlantInfoModal from "../../PlantInfoModal/PlantInfoModal";
 
 interface Props {
   userID?: string;
   plant: TreflePlant;
 }
 
-export default function PlantListItem(props: Props) {
+export default function SearchResultItem(props: Props) {
   const [visible, setVisible] = useState<boolean>(false);
-  const [open, setOpen] = useState<boolean>(false);
+  const [addOpen, setAddOpen] = useState<boolean>(false);
+  const [infoOpen, setInfoOpen] = useState<boolean>(false);
 
   function handleImageError(e: any) {
     e.target.onerror = null;
     e.target.src = "http://via.placeholder.com/140x360";
   }
 
-  // TODO add error handling
   const addPlantToList = async (
     name: string,
     listID: string,
@@ -37,16 +38,27 @@ export default function PlantListItem(props: Props) {
     frequency: string
   ) => {
     await PlantService.AddUserPlant(name, listID, plantID, frequency);
-    setOpen(false);
+    setAddOpen(false);
+  };
+
+  const handleClose = () => {
+    setInfoOpen(false);
+    setAddOpen(false);
   };
 
   return (
     <React.Fragment>
       <AddPlantModal
-        open={open}
+        open={addOpen}
         userID={props.userID}
         plantID={props.plant.id.toString()}
         handleAdd={addPlantToList}
+        handleClose={handleClose}
+      />
+      <PlantInfoModal
+        open={infoOpen}
+        plantID={props.plant.id.toString()}
+        handleClose={handleClose}
       />
       <Grid
         item
@@ -63,7 +75,7 @@ export default function PlantListItem(props: Props) {
               <IconButton
                 disabled={!props.userID}
                 aria-label="add"
-                onClick={() => setOpen(true)}
+                onClick={() => setAddOpen(true)}
               >
                 <AddIcon />
               </IconButton>
@@ -90,7 +102,7 @@ export default function PlantListItem(props: Props) {
           />
           <CardContent>
             <CardActions disableSpacing>
-              <Button size="small" href={`/plant/${props.plant.id}`}>
+              <Button size="small" onClick={() => setInfoOpen(true)}>
                 Learn More
               </Button>
             </CardActions>

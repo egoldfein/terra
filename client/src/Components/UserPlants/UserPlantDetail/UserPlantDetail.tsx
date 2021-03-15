@@ -1,8 +1,11 @@
 import { useState, useEffect } from "react";
-import { Box, Grid, Typography } from "@material-ui/core";
-import { UserPlant, TreflePlant } from "../../../Services/Plants/PlantTypes";
 import { Theme, makeStyles, createStyles } from "@material-ui/core/styles";
+import { Box, Grid, Typography } from "@material-ui/core";
 import { Skeleton } from "@material-ui/lab";
+import { UserPlant, TreflePlant } from "../../../Services/Plants/PlantTypes";
+import PlantService from "../../../Services/Plants/PlantService";
+import NotFound from "../../../Pages/NotFound/NotFound";
+import RelativeDate from "../../../Services/Utils/TimeUtils";
 
 interface Props {
   plant?: UserPlant;
@@ -26,6 +29,8 @@ export default function PlantDetail(props: Props) {
   const classes = useStyles();
   const [visible, setVisible] = useState<boolean>(false);
   const [img, setImg] = useState<HTMLImageElement>();
+  const [humidity, setHumidity] = useState<string>();
+  const [light, setLight] = useState<string>();
 
   const handleImageError = (e: any) => {
     e.target.onerror = null;
@@ -37,6 +42,13 @@ export default function PlantDetail(props: Props) {
   };
 
   useEffect(() => {
+    if (props.plantDetail?.light) {
+      setLight(PlantService.GetLevel(props.plantDetail?.light));
+    }
+    if (props.plantDetail?.humidity) {
+      setHumidity(PlantService.GetLevel(props.plantDetail?.humidity));
+    }
+
     const image = new Image();
     image.onload = handleImageLoad;
     image.onerror = handleImageError;
@@ -46,6 +58,8 @@ export default function PlantDetail(props: Props) {
   }, []);
 
   if (props.plant !== undefined && props.plantDetail !== undefined) {
+    let lastWatered = RelativeDate(props.plant.last_watered);
+
     return (
       <Grid
         style={{ textAlign: "center", paddingTop: "50px" }}
@@ -91,7 +105,7 @@ export default function PlantDetail(props: Props) {
               </Typography>
             </Grid>
             <Grid item xs={12}>
-              <Typography variant="body2">
+              <Typography component={"span"} variant="body2">
                 <Box fontStyle="italic">
                   {props.plantDetail.scientific_name}
                 </Box>
@@ -99,9 +113,7 @@ export default function PlantDetail(props: Props) {
             </Grid>
             <Grid item xs={12}>
               <Typography variant="h6">Last Watered</Typography>
-              <Typography variant="body1">
-                {props.plant.last_watered}
-              </Typography>
+              <Typography variant="body1">{lastWatered}</Typography>
             </Grid>
             <Grid item xs={12}>
               <Typography variant="h6">Watering Frequency</Typography>
@@ -116,20 +128,16 @@ export default function PlantDetail(props: Props) {
             spacing={2}
             style={{ paddingTop: "30px" }}
           >
-            {props.plantDetail.light ? (
+            {light ? (
               <Grid item xs={12}>
                 <Typography variant="h6">Required Light</Typography>
-                <Typography variant="body1">
-                  {props.plantDetail.light}
-                </Typography>
+                <Typography variant="body1">{light}</Typography>
               </Grid>
             ) : null}
-            {props.plantDetail.humidity ? (
+            {humidity ? (
               <Grid item xs={12}>
                 <Typography variant="h6">Required Humidity</Typography>
-                <Typography variant="body1">
-                  {props.plantDetail.humidity}
-                </Typography>
+                <Typography variant="body1">{humidity}</Typography>
               </Grid>
             ) : null}
             {props.plantDetail.min_temp && props.plantDetail.max_temp ? (
@@ -166,6 +174,5 @@ export default function PlantDetail(props: Props) {
     );
   }
 
-  // TODO Not Found
-  return <div />;
+  return <NotFound />;
 }

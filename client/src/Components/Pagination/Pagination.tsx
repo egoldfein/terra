@@ -1,5 +1,5 @@
-import { Pagination } from "@material-ui/lab";
 import { Grid } from "@material-ui/core";
+import { Pagination } from "@material-ui/lab";
 
 interface Props {
   total: number;

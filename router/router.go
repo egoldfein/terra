@@ -5,7 +5,7 @@ import (
 
 	"github.com/egoldfein/terra/api"
 	"github.com/egoldfein/terra/internal/trefle"
-	"github.com/egoldfein/terra/internal/users"
+	user_plants "github.com/egoldfein/terra/internal/userPlants"
 	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
 )
@@ -17,15 +17,15 @@ type Router struct {
 
 type Dependencies struct {
 	plantsHandler *api.PlantsHandler
-	userHandler *api.UserHandler
+	userPlantHandler *api.UserPlantHandler
 }
 
-func New(ctx context.Context, t trefle.API, u users.API) *Router{
+func New(ctx context.Context, t trefle.API, u user_plants.API) *Router{
 	router := &Router{
 		Engine: gin.New(),
 		Dependencies: &Dependencies{
 			plantsHandler: api.NewPlantsHandler(t),
-			userHandler: api.NewUserHandler(u),
+			userPlantHandler: api.NewUserPlantHandler(u),
 		},
 	}
 
@@ -55,28 +55,28 @@ func (r *Router) AddAPIRoutes(ctx context.Context){
 	})
 
 	r.Engine.POST("/api/v1/list", func(c *gin.Context) {
-		r.Dependencies.userHandler.CreatePlantList(c)
+		r.Dependencies.userPlantHandler.CreatePlantList(c)
 	})
 
 	r.Engine.GET("/api/v1/list/:id", func(c *gin.Context) {
-		r.Dependencies.userHandler.GetPlantList(c)
+		r.Dependencies.userPlantHandler.GetPlantList(c)
 	})
 
 	r.Engine.GET("/api/v1/user/:id/lists", func(c *gin.Context) {
-		r.Dependencies.userHandler.GetPlantLists(c)
+		r.Dependencies.userPlantHandler.GetPlantLists(c)
 	})
 
 	r.Engine.POST("/api/v1/plant", func(c *gin.Context) {
-		r.Dependencies.userHandler.AddPlant(c)
+		r.Dependencies.userPlantHandler.AddPlant(c)
 	})
 
 	r.Engine.GET("/api/v1/plant/:id", func(c *gin.Context) {
-		r.Dependencies.userHandler.GetPlant(c)
+		r.Dependencies.userPlantHandler.GetPlant(c)
 	})
 
 
 	r.Engine.PUT("/api/v1/plant", func(c *gin.Context) {
-		r.Dependencies.userHandler.UpdatePlant(c)
+		r.Dependencies.userPlantHandler.UpdatePlant(c)
 	})
 }
 

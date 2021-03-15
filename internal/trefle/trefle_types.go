@@ -1,11 +1,16 @@
 package trefle
 
+// RawPlantList defines the type returned from the Trefle API for the list plants
+// and search endpoints. See https://docs.trefle.io/reference/#operation/listPlants
+// for more information
 type RawPlantList struct {
 	Data  []Plant `json:"data"`
 	Links Links    `json:"links"`
 	Meta  Meta     `json:"meta"`
 }
 
+// RawPlant defines the return type returned from the Trefle API for the get plant endpoint.
+// See https://docs.trefle.io/reference/#operation/getPlant for more information
 type RawPlant struct {
 	Data Plant `json:"data"`
 	Meta  Meta     `json:"meta"`
@@ -105,12 +110,14 @@ type Temperature struct {
 	Celcius int `json:"deg_c"`
 }
 
+// PlantListResp defines the response returned by the internal API to list Trefle plants
 type PlantListResp struct {
 	Plants []PlantResp `json:"plants"`
 	Links Links `json:"links"`
 	Total int `json:"total"`
 }
 
+// PlantResp defines the response returned by the internal API to get a Trefle plant
 type PlantResp struct {
 	ID int `json:"id"`
 	CommonName string    `json:"common_name"`

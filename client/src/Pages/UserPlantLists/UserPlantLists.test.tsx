@@ -1,16 +1,14 @@
 import { mount } from "enzyme";
 import { act } from "react-dom/test-utils";
-import UserPlantDetail from "./UserPlantDetail";
+import { ListItem } from "@material-ui/core";
+import UserPlantListsPage from "./UserPlantLists";
 import PlantService from "../../Services/Plants/PlantService";
-import { UserPlant } from "../../Services/Plants/PlantTypes";
+import { UserPlantList } from "../../Services/Plants/PlantTypes";
 
 describe("<Plant />", () => {
   let container;
-  const params = {
-    params: { id: "123" },
-    isExact: true,
-    path: "",
-    url: "",
+  let mockUser: any = {
+    sub: "123",
   };
 
   beforeEach(() => {
@@ -31,21 +29,22 @@ describe("<Plant />", () => {
   };
 
   it("should call get plant with id in params", async () => {
-    const fakeUserPlant: UserPlant = {
-      plant_id: "123",
-      name: "",
-      id: 12,
-      last_watered: "",
-      watering_frequency: "daily",
-    };
+    const fakeUserPlantList: UserPlantList[] = [
+      {
+        name: "",
+        id: "1",
+        user_id: "123",
+      },
+    ];
     jest
-      .spyOn(PlantService, "GetUserPlant")
-      .mockImplementation(() => Promise.resolve(fakeUserPlant));
+      .spyOn(PlantService, "GetUserPlantLists")
+      .mockImplementation(() => Promise.resolve(fakeUserPlantList));
     await act(() => new Promise(setImmediate));
-    const wrapper = mount(<UserPlantDetail match={params} />);
+    const wrapper = mount(<UserPlantListsPage user={mockUser} />);
     await waitForComponent(wrapper);
     expect(wrapper.exists()).toBeTruthy();
-    let getPlant = jest.spyOn(PlantService, "GetUserPlant");
-    expect(getPlant).toHaveBeenCalledWith("123");
+    let listPlants = jest.spyOn(PlantService, "GetUserPlantLists");
+    expect(listPlants).toHaveBeenCalledWith("123");
+    expect(wrapper.find(ListItem)).toHaveLength(2);
   });
 });

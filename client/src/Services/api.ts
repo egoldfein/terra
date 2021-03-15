@@ -1,4 +1,10 @@
-export class Api {
+export interface IApi {
+  get(url: string): Promise<object | object[]>;
+  post(url: string, body: BodyInit): Promise<object | object[]>;
+  put(url: string, body: BodyInit): Promise<object | object[]>;
+}
+
+export class Api implements IApi {
   async get(url: string): Promise<object | object[]> {
     let request: RequestInit = {
       method: "GET",

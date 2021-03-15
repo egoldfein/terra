@@ -1,11 +1,11 @@
 import { shallow } from "enzyme";
-import Search from "./Search";
 import { Button, Select, OutlinedInput, Switch } from "@material-ui/core";
+import SearchInput from "./SearchInput";
 
-describe("<Search />", () => {
-  it("should render Search component", () => {
+describe("<SearchInput />", () => {
+  it("should render SearchInput component", () => {
     const wrapper = shallow(
-      <Search onSearch={jest.fn()} light="" edible={false} search="" />
+      <SearchInput onSearch={jest.fn()} light="" edible={false} search="" />
     );
     expect(wrapper.exists()).toBeTruthy();
   });
@@ -13,7 +13,12 @@ describe("<Search />", () => {
   it("should render all inputs within component", () => {
     let searchFn = jest.fn();
     const wrapper = shallow(
-      <Search onSearch={searchFn} light="medium" edible={true} search="rose" />
+      <SearchInput
+        onSearch={searchFn}
+        light="medium"
+        edible={true}
+        search="rose"
+      />
     );
 
     expect(wrapper.find(Select).exists()).toBeTruthy();
@@ -28,7 +33,7 @@ describe("<Search />", () => {
   it("should call search function on submit", () => {
     let searchFn = jest.fn();
     const wrapper = shallow(
-      <Search onSearch={searchFn} light="" edible={false} search="" />
+      <SearchInput onSearch={searchFn} light="" edible={false} search="" />
     );
 
     wrapper.find(Button).simulate("click");

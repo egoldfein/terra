@@ -7,6 +7,9 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strings"
+
+	log "github.com/sirupsen/logrus"
 )
 
 const (
@@ -23,24 +26,26 @@ type API interface {
 type APIClient struct {
 	endpoint   string
 	key        string
+	logger *log.Logger
 	Client *http.Client
 }
 
 // New returns a new NYT API Client
-func New(key string) (*APIClient, error) {
+func New(key string, logger *log.Logger) (*APIClient, error) {
 	if key == "" {
 		return nil, errors.New("api key cannot be empty")
 	}
 	a := &APIClient{
 		endpoint:   endpoint,
 		key:        key,
+		logger: logger,
 		Client: &http.Client{},
 	}
 
 	return a, nil
 }
 
-// SearchPlants gets a list of plants based on the search string and query parameters
+// SearchPlants returns a list of plants from the Trefle API based on the search string and query parameters
 func (api *APIClient) SearchPlants(ctx context.Context, light *string, edible *string, search *string, page *string) (PlantListResp, error) {
 	// Build query string
 	query := ""
@@ -66,29 +71,33 @@ func (api *APIClient) SearchPlants(ctx context.Context, light *string, edible *s
 	}
 
 	if search != nil && len(*search) > 0 {
-		query = fmt.Sprintf("%sq=%s&", query, *search)
+		searchStr := strings.ReplaceAll(*search, "+", "%20")
+		query = fmt.Sprintf("%sq=%s&", query, searchStr)
 		path = "/plants/search?"
 	}
 
 
-	// Filter out plants that do not have these values set
-	// query = fmt.Sprintf("%s&filter_not[light]=null&filter_not[maximum_temperature_deg_f]=null&filter_not[minimum_temperature_deg_f]=null&filter_not[minimum_precipitation_mm]=null&filter_not[maximum_precipitation_mm]=null", query)
+	// Filter out plants that do not have this value set
 	query = fmt.Sprintf("%s&filter_not[common_name]=null", query)
+
 	urlStr := fmt.Sprintf("%s%s%s&token=%s", api.endpoint, path, query, api.key)
 	resp, err := api.Client.Get(urlStr)
 	if err != nil {
+		log.Error(err)
 		return PlantListResp{}, err
 	}
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
+		log.Error(err)
 		return PlantListResp{}, err
 	}
 
 	rawPlantList := RawPlantList{}
 	err = json.Unmarshal(body, &rawPlantList)
 	if err != nil {
+		log.Error(err)
 		return PlantListResp{}, err
 	}
 
@@ -110,7 +119,7 @@ func (api *APIClient) SearchPlants(ctx context.Context, light *string, edible *s
 	return plantListResp, nil
 }
 
-// GetPlant gets a list of plants based on the query string
+// GetPlant gets a Trefle API plant based on ID
 func (api *APIClient) GetPlant(ctx context.Context, id string) (*PlantResp, error) {
 	if len(id) == 0 {
 		return nil, errors.New("id cannot be empty")
@@ -119,18 +128,21 @@ func (api *APIClient) GetPlant(ctx context.Context, id string) (*PlantResp, erro
 	urlStr := fmt.Sprintf("%s/plants/%s?token=%s", api.endpoint, id, api.key)
 	resp, err := api.Client.Get(urlStr)
 	if err != nil {
+		log.Error(err)
 		return nil, err
 	}
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
+		log.Error(err)
 		return nil, err
 	}
 
 	rawPlant := RawPlant{}
 	err = json.Unmarshal(body, &rawPlant)
 	if err != nil {
+		log.Error(err)
 		return nil, err
 	}
 
@@ -170,8 +182,8 @@ func (api *APIClient) GetPlant(ctx context.Context, id string) (*PlantResp, erro
 	return &plantResp, nil
 }
 
+// GetDistribution returns a distribution by ID from the Trefle API
 func (api *APIClient) GetDistribution(ctx context.Context, id string) (*DistributionResp, error) {
-
 	if len(id) == 0 {
 		return nil, errors.New("id cannot be empty")
 	}
@@ -180,18 +192,21 @@ func (api *APIClient) GetDistribution(ctx context.Context, id string) (*Distribu
 
 	resp, err := api.Client.Get(urlStr)
 	if err != nil {
+		log.Error(err)
 		return nil, err
 	}
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
+		log.Error(err)
 		return nil, err
 	}
 
 	distrResp := DistributionResp{}
 	err = json.Unmarshal(body, &distrResp)
 	if err != nil {
+		log.Error(err)
 		return nil, err
 	}
 

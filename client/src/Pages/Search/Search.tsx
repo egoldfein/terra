@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
+import { Grid, Typography, LinearProgress } from "@material-ui/core";
 import history from "../../history";
-import { Grid, Typography, LinearProgress, Button } from "@material-ui/core";
-import Search from "../../Components/Search/SearchInput/Search";
-import PlantListComponent from "../../Components/Search/SearchResults/PlantList";
-import PlantService from "../../Services/Plants/PlantService";
 import { TreflePlantList } from "../../Services/Plants/PlantTypes";
+import SearchInput from "../../Components/Search/SearchInput/SearchInput";
+import SearchResults from "../../Components/Search/SearchResults/SearchResults";
 import Pagination from "../../Components/Pagination/Pagination";
+import PlantService from "../../Services/Plants/PlantService";
 
 export default function SearchPage({ user }: any) {
   const params = new URLSearchParams(location.search);
@@ -43,6 +43,7 @@ export default function SearchPage({ user }: any) {
     onSearch(params);
   };
 
+  let searchString = params.get("search");
   return (
     <React.Fragment>
       <Grid container spacing={3} style={{ padding: "20px" }}>
@@ -50,11 +51,11 @@ export default function SearchPage({ user }: any) {
           <Typography variant="h4">Search</Typography>
         </Grid>
         <Grid item xs={12} sm={12} md={2} lg={2} xl={2}>
-          <Search
+          <SearchInput
             onSearch={onSearch}
             light={params.get("light") || ""}
             edible={params.get("edible") === "true"}
-            search={params.get("search") || ""}
+            search={searchString ? decodeURI(searchString) : ""}
           />
         </Grid>
         <Grid item xs={12} sm={12} md={10} lg={10} xl={10}>
@@ -62,7 +63,7 @@ export default function SearchPage({ user }: any) {
             <LinearProgress />
           ) : plantList && plantList.plants ? (
             <React.Fragment>
-              <PlantListComponent plants={plantList?.plants} userID={userID} />
+              <SearchResults plants={plantList?.plants} userID={userID} />
               <Pagination
                 total={plantList?.total}
                 onPageChange={onPageChange}
@@ -70,7 +71,19 @@ export default function SearchPage({ user }: any) {
               />
             </React.Fragment>
           ) : (
-            <div />
+            <Grid container spacing={3}>
+              <Grid
+                item
+                xs={12}
+                sm={12}
+                md={10}
+                lg={10}
+                xl={10}
+                style={{ textAlign: "center" }}
+              >
+                <Typography variant="body1">No results</Typography>
+              </Grid>
+            </Grid>
           )}
         </Grid>
       </Grid>

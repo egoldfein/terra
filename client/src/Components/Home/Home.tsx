@@ -58,22 +58,6 @@ export default function Home() {
           </Typography>
         </Grid>
       </Grid>
-      <Grid
-        container
-        style={{
-          padding: "20px",
-          background: "white",
-          minHeight: "100vh",
-        }}
-        spacing={4}
-      >
-        <Grid item xs={12}>
-          <Typography variant="h4">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            eiusmod tempor incididunt ut labore.
-          </Typography>
-        </Grid>
-      </Grid>
     </React.Fragment>
   );
 }

@@ -43,6 +43,8 @@ export default function Header({ user }: any) {
                 aria-controls="simple-menu"
                 aria-haspopup="true"
                 onClick={handleClick}
+                variant="text"
+                style={{ color: "white" }}
               >
                 Hello, {user.name}
               </Button>

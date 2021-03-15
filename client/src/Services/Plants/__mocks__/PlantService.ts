@@ -43,13 +43,19 @@ let mockUserPlant: UserPlant = {
   watering_frequency: "daily",
 };
 
+let mockUserPlantList: UserPlantList = {
+  name: "My first list",
+  id: "123",
+  user_id: "1",
+};
+
 let mockPlantList: TreflePlantList = {
   plants: [mockPlant, mockPlant2],
   links: {
-    self: "",
-    next: "",
-    last: "",
-    first: "",
+    self: "self-url",
+    next: "next-url",
+    last: "last-url",
+    first: "first-url",
   },
   total: 1,
 };
@@ -67,7 +73,8 @@ export class MockPlantService implements IPlantService {
   __getSome = mockPlantList;
   __getZone = mockZone;
   __getOneUserPlant = mockUserPlant;
-
+  __getUserPlantList = [mockUserPlant];
+  __getUserPlantsLists = [mockUserPlantList];
   async ListTreflePlants(params: URLSearchParams): Promise<TreflePlantList> {
     return Promise.resolve(mockPlantList);
   }
@@ -86,16 +93,24 @@ export class MockPlantService implements IPlantService {
     return Promise.reject();
   }
 
-  // TO DO all mocks below
   async GetUserPlantLists(userID: string): Promise<UserPlantList[]> {
+    if (userID !== null) {
+      return Promise.resolve(this.__getUserPlantsLists);
+    }
     return Promise.reject();
   }
 
   async GetUserPlantList(id: string): Promise<UserPlant[]> {
+    if (id !== null) {
+      return Promise.resolve(this.__getUserPlantList);
+    }
     return Promise.reject();
   }
 
   async GetUserPlant(id: string): Promise<UserPlant> {
+    if (id != "") {
+      return Promise.resolve(mockUserPlant);
+    }
     return Promise.reject();
   }
 
@@ -104,11 +119,27 @@ export class MockPlantService implements IPlantService {
     listID: string,
     trefleID: string
   ): Promise<void> {
+    if (name !== "" && listID != "" && trefleID != "") {
+      return Promise.resolve();
+    }
     return Promise.reject();
   }
 
   async AddUserList(name: string, userID: string): Promise<void> {
+    if (name !== "" && userID !== "") {
+      return Promise.resolve();
+    }
     return Promise.reject();
+  }
+
+  GetLevel(measurement: number): string {
+    if (measurement <= 3) {
+      return "Low";
+    } else if (measurement > 3 && measurement < 6) {
+      return "Medium";
+    } else {
+      return "High";
+    }
   }
 }
 

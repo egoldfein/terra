@@ -1,28 +1,28 @@
 import { Grid, Typography } from "@material-ui/core";
 import { TreflePlant } from "../../../Services/Plants/PlantTypes";
-import PlantListItem from "../../SearchResultItem/PlantListItem";
+import SearchResultItem from "../SearchResultItem/SearchResultItem";
 
 interface Props {
   userID?: string;
   plants: TreflePlant[];
 }
 
-export default function PlantList(props: Props) {
+export default function SearchResults(props: Props) {
   if (props.plants.length > 0) {
     return (
       <Grid container spacing={3}>
         {props.plants.map((p: TreflePlant, i: number) => {
           return (
-            <PlantListItem
+            <SearchResultItem
               key={i}
               plant={p}
               userID={props.userID}
-            ></PlantListItem>
+            ></SearchResultItem>
           );
         })}
       </Grid>
     );
   }
 
-  return <Typography>Sorry, we couldn't find any results.</Typography>;
+  return null;
 }

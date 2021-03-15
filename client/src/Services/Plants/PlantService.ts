@@ -7,38 +7,54 @@ import {
   IPlantService,
 } from "./PlantTypes";
 import api from "../Api";
-import { time } from "node:console";
 
 export class PlantService implements IPlantService {
-  endpoint: string = "http://localhost:8080/api/v1";
+  private endpoint: string = "http://localhost:8080/api/v1";
 
-  // ListPlants returns a list of plants from the from the Trefle API
+  // ListTreflePlants returns a list of plants from the from the Trefle API
   async ListTreflePlants(params: URLSearchParams): Promise<TreflePlantList> {
-    let resp = await api.get(`${this.endpoint}/search?${params.toString()}`);
+    let resp = await api
+      .get(`${this.endpoint}/search?${params.toString()}`)
+      .catch((err) => {
+        return new Error(err);
+      });
     return resp as TreflePlantList;
   }
 
-  // GetTreflePlantDetail returns a plant by id from the Trefle API
+  // GetTreflePlant returns a plant by id from the Trefle API
   async GetTreflePlant(id: string): Promise<TreflePlant> {
-    let resp = await api.get(`${this.endpoint}/plant/${id}/detail`);
+    let resp = await api
+      .get(`${this.endpoint}/plant/${id}/detail`)
+      .catch((err) => {
+        return new Error(err);
+      });
     return resp as TreflePlant;
   }
 
   // GetUserPlantLists returns all of a user's lists
   async GetUserPlantLists(userID: string): Promise<UserPlantList[]> {
-    let resp = await api.get(`${this.endpoint}/user/${userID}/lists`);
+    let resp = await api
+      .get(`${this.endpoint}/user/${userID}/lists`)
+      .catch((err) => {
+        return new Error(err);
+      });
     return resp as UserPlantList[];
   }
 
   // GetUserPlantList returns a user's list of plants by list id
   async GetUserPlantList(id: string): Promise<UserPlant[]> {
-    let resp = await api.get(`${this.endpoint}/list/${id}`);
+    let resp = await api.get(`${this.endpoint}/list/${id}`).catch((err) => {
+      return new Error(err);
+    });
+
     return resp as UserPlant[];
   }
 
   // GetUserPlant returns a user's plant by id
   async GetUserPlant(id: string): Promise<UserPlant> {
-    let resp = await api.get(`${this.endpoint}/plant/${id}`);
+    let resp = await api.get(`${this.endpoint}/plant/${id}`).catch((err) => {
+      return new Error(err);
+    });
     return resp as UserPlant;
   }
 
@@ -55,7 +71,9 @@ export class PlantService implements IPlantService {
       trefle_plant_id: trefleID.toString(),
       watering_frequency: frequency,
     });
-    await api.post(`${this.endpoint}/plant/`, requestBody);
+    await api.post(`${this.endpoint}/plant/`, requestBody).catch((err) => {
+      return new Error(err);
+    });
   }
 
   // AddUserList creates a new user plant list
@@ -64,7 +82,9 @@ export class PlantService implements IPlantService {
       user_id: userID,
       name: name,
     });
-    await api.post(`${this.endpoint}/list`, requestBody);
+    await api.post(`${this.endpoint}/list`, requestBody).catch((err) => {
+      return new Error(err);
+    });
   }
 
   // UpdateLastWatered updates when plant was last watered
@@ -73,7 +93,9 @@ export class PlantService implements IPlantService {
       id: plantID,
       last_watered: date,
     });
-    await api.put(`${this.endpoint}/plant`, requestBody);
+    await api.put(`${this.endpoint}/plant`, requestBody).catch((err) => {
+      return new Error(err);
+    });
   }
 
   // GetDistribution returns a distribution zone by id
@@ -84,6 +106,16 @@ export class PlantService implements IPlantService {
         return new Error(err);
       });
     return resp as Zone;
+  }
+
+  GetLevel(measurement: number): string {
+    if (measurement <= 3) {
+      return "Low";
+    } else if (measurement > 3 && measurement < 6) {
+      return "Medium";
+    } else {
+      return "High";
+    }
   }
 }
 

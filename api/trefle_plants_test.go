@@ -13,7 +13,7 @@ import (
 	"github.com/egoldfein/terra/api"
 	"github.com/egoldfein/terra/internal/trefle"
 	"github.com/egoldfein/terra/internal/trefle/treflefakes"
-
+	"github.com/egoldfein/terra/utils"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -21,18 +21,7 @@ const (
 	testToken = "token"
 )
 
-type RoundTripFunc func(req *http.Request) *http.Response
-
-func (f RoundTripFunc) RoundTrip(req *http.Request) (*http.Response, error) {
-	return f(req), nil
-}
-
-func NewTestClient(fn RoundTripFunc) *http.Client {
-	return &http.Client{
-		Transport: RoundTripFunc(fn),
-	}
-}
-
+// TODO Add error check tests
 func TestGetPlantSuccess(t *testing.T) {
 	var fakeTrefle = &treflefakes.FakeAPI{}
 	plantResp := trefle.PlantResp{
@@ -54,7 +43,7 @@ func TestGetPlantSuccess(t *testing.T) {
 	fakeTrefle.GetPlantReturns(&plantResp, nil)
 	
 	body, err := json.Marshal(plantResp)
-	client := NewTestClient(func(req *http.Request) *http.Response {
+	client := utils.NewTestClient(func(req *http.Request) *http.Response {
 		assert.Equal(t, req.URL.String(), fmt.Sprintf("https://trefle.io/api/v1/plants/1?token=%s", testToken))
 		return &http.Response{
 			StatusCode: 200,
@@ -64,7 +53,7 @@ func TestGetPlantSuccess(t *testing.T) {
 	})
 
 	ctx := context.Background()
-	api, err := trefle.New(testToken)
+	api, err := trefle.New(testToken, nil)
 	assert.Nil(t, err)
 
 	api.Client = client
@@ -88,7 +77,7 @@ func TestGetDistributionSuccess(t *testing.T) {
 	fakeTrefle.GetDistributionReturns(&distrResp, nil)
 	
 	body, err := json.Marshal(distrResp)
-	client := NewTestClient(func(req *http.Request) *http.Response {
+	client := utils.NewTestClient(func(req *http.Request) *http.Response {
 		assert.Equal(t, req.URL.String(), fmt.Sprintf("https://trefle.io/api/v1/distributions/1?token=%s", testToken))
 		return &http.Response{
 			StatusCode: 200,
@@ -98,7 +87,7 @@ func TestGetDistributionSuccess(t *testing.T) {
 	})
 
 	ctx := context.Background()
-	api, err := trefle.New(testToken)
+	api, err := trefle.New(testToken, nil)
 	assert.Nil(t, err)
 
 	api.Client = client
@@ -141,7 +130,7 @@ func TestSearchPlantsSuccess(t *testing.T) {
 	fakeTrefle.SearchPlantsReturns(plantListResp, nil)
 	body, err := json.Marshal(plantListResp)
 
-	client := NewTestClient(func(req *http.Request) *http.Response {
+	client := utils.NewTestClient(func(req *http.Request) *http.Response {
 		query := req.URL.Query()
 		standardQuery := "filter_not[frost_free_days_minimum]=null&filter_not[light]=null&filter_not[minimum_precipitation_mm]=null&filter_not[minimum_temperature_deg_f]=null&filter_not[minimum_precipitation_mm]=null&filter_not[maximum_precipitation_mm]=null&filter_not[growth_months]=null"
 		assert.Equal(t, req.URL.String(), fmt.Sprintf("https://trefle.io/api/v1/plants/search?range[light]=4,6&q=%s&%s&token=%s", query.Get("q"), standardQuery, testToken))
@@ -153,7 +142,7 @@ func TestSearchPlantsSuccess(t *testing.T) {
 	})
 
 	ctx := context.Background()
-	api, err := trefle.New(testToken)
+	api, err := trefle.New(testToken, nil)
 	assert.Nil(t, err)
 
 	api.Client = client
