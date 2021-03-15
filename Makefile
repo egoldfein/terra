@@ -1,3 +1,5 @@
+
+
 fmt:
 	go fmt .
 
@@ -9,3 +11,6 @@ dev:
 
 gen:
 	go generate ./...
+
+test: 
+	go test -v ./... 
