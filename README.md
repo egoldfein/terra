@@ -17,12 +17,13 @@ What's next:
   - Trefle API Key can be retrieved [here](https://docs.trefle.io/docs/guides/getting-started/#what-you-need)
 - cd into client directory and create `auth_config.json` and add the following [Auth0](https://auth0.com/) credentials:
 
-```{
+```
+{
   "domain": <YOUR DOMAIN ID>
   "clientId": <YOUR CLIENT ID>
 }
 ```
 
 - run `npm run build`
-- cd to root directory and run `make dev`
-- go to http://localhost:8080
+- cd to root directory and run `go mod vendor`
+- run `make dev` and go to http://localhost:8080
